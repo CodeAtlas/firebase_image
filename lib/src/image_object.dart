@@ -2,7 +2,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseImageObject {
   int version;
-  Reference reference;
+  Reference? reference;
   String? localPath;
   final String remotePath;
   final String bucket;
@@ -10,7 +10,7 @@ class FirebaseImageObject {
 
   FirebaseImageObject({
     this.version = -1,
-    required this.reference,
+    this.reference,
     this.localPath,
     required this.bucket,
     required this.remotePath,
