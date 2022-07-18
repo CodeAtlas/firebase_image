@@ -4,17 +4,18 @@ version: 1.0.1
 homepage: https://github.com/mattreid1/firebase_image
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
+  flutter: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  firebase_core: ^1.10.5
-  firebase_storage: ^10.2.3
-  sqflite: ^2.0.1
-  path: ^1.8.0
-  path_provider: ^2.0.8
+  firebase_core: ^1.19.2
+  firebase_storage: ^10.3.2
+  sqflite: ^2.0.3
+  path: ^1.8.1
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_test:
