@@ -36,17 +36,17 @@ class FirebaseImage extends ImageProvider<FirebaseImage> {
   /// [cacheRefreshStrategy] Default: BY_METADATA_DATE. Specifies the strategy in which to check if the cached version should be refreshed (optional)
   /// [firebaseApp] Default: the default Firebase app. Specifies a custom Firebase app to make the request to the bucket from (optional)
   FirebaseImage(
-    String location, {
-    this.shouldCache = true,
-    this.scale = 1.0,
-    this.maxSizeBytes = 2500 * 1000, // 2.5MB
-    this.cacheRefreshStrategy = CacheRefreshStrategy.BY_METADATA_DATE,
-    this.firebaseApp,
-  }) : _imageObject = FirebaseImageObject(
-          bucket: _getBucket(location),
-          remotePath: _getImagePath(location),
-          reference: _getImageRef(location, firebaseApp),
-        );
+      String location, {
+        this.shouldCache = true,
+        this.scale = 1.0,
+        this.maxSizeBytes = 2500 * 1000, // 2.5MB
+        this.cacheRefreshStrategy = CacheRefreshStrategy.BY_METADATA_DATE,
+        this.firebaseApp,
+      }) : _imageObject = FirebaseImageObject(
+    bucket: _getBucket(location),
+    remotePath: _getImagePath(location),
+    reference: _getImageRef(location, firebaseApp),
+  );
 
   /// Returns the image as bytes
   Future<Uint8List> getBytes() {
@@ -78,7 +78,7 @@ class FirebaseImage extends ImageProvider<FirebaseImage> {
     if (shouldCache) {
       await cacheManager.open();
       FirebaseImageObject? localObject =
-          await cacheManager.get(_imageObject.uri, this);
+      await cacheManager.get(_imageObject.uri, this);
 
       if (localObject != null) {
         bytes = await cacheManager.localFileBytes(localObject);
@@ -92,15 +92,16 @@ class FirebaseImage extends ImageProvider<FirebaseImage> {
       }
     } else {
       bytes =
-          await cacheManager.remoteFileBytes(_imageObject, this.maxSizeBytes);
+      await cacheManager.remoteFileBytes(_imageObject, this.maxSizeBytes);
     }
 
     return bytes!;
   }
 
   Future<Codec> _fetchImageCodec() async {
+    var buffer = await ImmutableBuffer.fromUint8List(await _fetchImage());
     return await PaintingBinding.instance
-        .instantiateImageCodec(await _fetchImage());
+        .instantiateImageCodecWithSize(buffer);
   }
 
   @override
@@ -109,7 +110,7 @@ class FirebaseImage extends ImageProvider<FirebaseImage> {
   }
 
   @override
-  ImageStreamCompleter load(FirebaseImage key, DecoderCallback decode) {
+  ImageStreamCompleter loadImage(FirebaseImage key, ImageDecoderCallback decode) {
     return MultiFrameImageStreamCompleter(
       codec: key._fetchImageCodec(),
       scale: key.scale,
@@ -117,15 +118,15 @@ class FirebaseImage extends ImageProvider<FirebaseImage> {
   }
 
   @override
-  bool operator ==(dynamic other) {
-    if (other.runtimeType != runtimeType) return false;
-    final FirebaseImage typedOther = other;
-    return _imageObject.uri == typedOther._imageObject.uri &&
-        this.scale == typedOther.scale;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is FirebaseImage &&
+              runtimeType == other.runtimeType &&
+              scale == other.scale &&
+              _imageObject.uri == other._imageObject.uri;
 
   @override
-  int get hashCode => hashValues(_imageObject.uri, this.scale);
+  int get hashCode => scale.hashCode ^ _imageObject.uri.hashCode;
 
   @override
   String toString() =>
